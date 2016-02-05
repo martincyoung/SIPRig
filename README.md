@@ -8,6 +8,10 @@ SIPRig is a lightweight tool for sending a SIP message.
 
 If you don't care for valid SIP dialog, or even valid SIP, then SIPRig is for you!  Construct your SIP message in an input file and send it to an unsuspecting address of your choosing.
 
+## Limitations
+
+SIPRig is written in python 2.7.  It works functionaly in python 3, however several `print` statements will need to be removed/updated.  This will be rectified in a future version.
+
 ## Example Usage
 
     $ cat message.txt 
