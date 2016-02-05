@@ -10,7 +10,7 @@ If you don't care for valid SIP dialog, or even valid SIP, then SIPRig is for yo
 
 ## Limitations
 
-SIPRig is written in python 2.7.  It works functionaly in python 3, however several `print` statements will need to be removed/updated.  This will be rectified in a future version.
+SIPRig is written in python 2.7.  It works functionally in python 3, however several `print` statements will need to be removed/updated.  This will be rectified in a future version.
 
 ## Example Usage
 
