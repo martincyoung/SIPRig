@@ -87,34 +87,35 @@ def main():
 
     try:
         request = Request(args.input_file, args.validate_request)
-    except Exception as e:
-        print("Error - could not load from file:\n    " + str(e))
-        exit(-1)
 
-    try:
         s = get_socket(args.src_ip, args.src_port, args.timeout)
-    except Exception as e:
-        print("Error - could not create socket:\n    " + str(e))
-        s.close()
-        exit(-1)
-
-    try:
         s.sendto(request.bytes, (args.dest_ip, args.dest_port))
+
         print("\nRequest sent to %s:%d:\n" % (args.dest_ip, args.dest_port))
         print(request.bytes.decode())
-    except Exception as e:
-        print("Error - could not send packet.\n    " + str(e))
-        s.close
-        exit(-1)
 
-    try:
         response = s.recv(65535)
+
         print("Response from %s:%d:\n" % (args.dest_ip, args.dest_port))
         print(response.decode())
+
     except socket.timeout:
         print('No response received within %0.1f seconds' % args.timeout)
 
-    s.close()
+    except socket.error as e:
+        print("Error - could not create socket:\n    " + str(e))
+        exit(-1)
+
+    except Exception as e:
+        print("Error:\n    " + str(e))
+        exit(-1)
+
+    finally:
+        try:
+            s.close()
+        except UnboundLocalError:
+            # Socket has not been assigned.
+            pass
 
 if __name__ == '__main__':
     main()
