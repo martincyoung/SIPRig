@@ -46,6 +46,7 @@ SIPRig is written in python 2.7.  It works functionally in python 3, however sev
                             Source IP address.
       -P SRC_PORT, --src-port=SRC_PORT
                             Source port.
+      --no-validation       Disable line ending validation.
 
 ## Installation
 

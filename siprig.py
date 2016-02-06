@@ -3,38 +3,44 @@ import socket
 from optparse import OptionParser
 
 
-class SIPRigException(Exception):
-    pass
+#class SIPRigException(Exception):
+#    pass
 
 
-class SIPRigRequestException(SIPRigException):
-    pass
+#class SIPRigRequestException(SIPRigException):
+#    pass
 
 
-class SIPRigBlankLineException(SIPRigRequestException):
-    pass
+#class SIPRigBlankLineException(SIPRigRequestException):
+#    pass
 
 
 class Request():
-    def __init__(self, input_file):
+    def __init__(self, input_file, validate):
         self.bytes = self.get_req_from_file(input_file)
-        self.validate()
+        if validate:
+            self.validate()
 
     def get_req_from_file(self, input_file):
-        file_handle = open(input_file, "rb")
+        # Read the input file as a byte array, and convert to Unix line
+        # endings if required.
+        file_handle = open(input_file, "rbU")
         sip_bytes = file_handle.read()
         file_handle.close()
 
         return sip_bytes
 
     def validate(self):
-        if (self.bytes[-2:] == '\n\n') or (self.bytes[-4:] == '\r\n\r\n'):
-            return True
-        else:
-            raise SIPRigBlankLineException("File must end with 2 blank lines")
+        self.add_blank_lines()
+
+    def add_blank_lines(self):
+        while (self.bytes[-2:] != '\n\n'):
+            self.bytes += '\n'
 
 
 def get_socket(src_address, src_port):
+    # Create an IPv4 UDP socket.  If no source address or source port is
+    # provided, the socket module assigns this automatically.
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     s.bind((src_address, src_port))
     s.settimeout(0.0)
@@ -74,6 +80,11 @@ def get_options():
                       type='int',
                       default=0,
                       help='Source port.')
+    parser.add_option('--no-validation',
+                      dest='validate_request',
+                      action='store_false',
+                      default=True,
+                      help='Disable line ending validation.')
 
     (options, args) = parser.parse_args()
 
@@ -93,11 +104,11 @@ def get_options():
 def main():
     options = get_options()
 
-    try:
-        sip_req = Request(options.input_file)
-    except SIPRigRequestException, e:
-        print "Error - could not load from file:\n    " + str(e)
-        exit(-1)
+    #try:
+    sip_req = Request(options.input_file, options.validate_request)
+    #except SIPRigRequestException, e:
+    #    print "Error - could not load from file:\n    " + str(e)
+    #    exit(-1)
 
     try:
         s = get_socket(options.src_ip, options.src_port)
