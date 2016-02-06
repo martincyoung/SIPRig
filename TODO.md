@@ -1,7 +1,6 @@
 ## TODO
 
 - EASY.  Add a 'quiet' option.
-- EASY.  Nicer exception handling.
 - EASY.  Populate a set of default headers if they're not specified in the input.
 - EASY.  Add warning if validation is disabled.
 - MEDIUM.  Automatically populate SIP values based on destination and source values.
