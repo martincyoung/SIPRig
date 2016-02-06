@@ -32,19 +32,20 @@ SIPRig is written in python 2.7.  It works functionally in python 3, however sev
 ## Full Usage
 
     $ python siprig.py -h
-    Usage: siprig.py [OPTIONS]
+    usage: siprig.py [-h] -f INPUT_FILE -d DEST_IP [-p DEST_PORT] [-S SRC_IP]
+                     [-P SRC_PORT] [--no-validation]
 
-    Options:
+    optional arguments:
       -h, --help            show this help message and exit
-      -f INPUT_FILE, --input_file=INPUT_FILE
+      -f INPUT_FILE, --input_file INPUT_FILE
                             *Required - Input file
-      -d DEST_IP, --dest-ip=DEST_IP
+      -d DEST_IP, --dest-ip DEST_IP
                             *Required - Destination IP address.
-      -p DEST_PORT, --dest-port=DEST_PORT
-                            Destination port.  Defaults to 5060.
-      -S SRC_IP, --src-ip=SRC_IP
+      -p DEST_PORT, --dest-port DEST_PORT
+                            Destination port. Defaults to 5060.
+      -S SRC_IP, --src-ip SRC_IP
                             Source IP address.
-      -P SRC_PORT, --src-port=SRC_PORT
+      -P SRC_PORT, --src-port SRC_PORT
                             Source port.
       --no-validation       Disable line ending validation.
 
