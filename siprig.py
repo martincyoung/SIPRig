@@ -34,8 +34,8 @@ class Request():
         self.add_blank_lines()
 
     def add_blank_lines(self):
-        while (self.bytes[-2:] != '\n\n'):
-            self.bytes += '\n'
+        while (self.bytes[-2:] != '\n\n'.encode()):
+            self.bytes += '\n'.encode()
 
 
 def get_socket(src_address, src_port):
@@ -86,16 +86,6 @@ def get_args():
 
     args = parser.parse_args()
 
-    if (args.input_file is None):
-        print "No input file specified\n"
-        parser.print_help()
-        exit(-1)
-
-    if (args.dest_ip is None):
-        print "No destination IP specified\n"
-        parser.print_help()
-        exit(-1)
-
     return args
 
 
@@ -110,17 +100,17 @@ def main():
 
     try:
         s = get_socket(args.src_ip, args.src_port)
-    except Exception, e:
-        print "Error - could not create socket:\n    " + str(e)
+    except Exception as e:
+        print("Error - could not create socket:\n    " + str(e))
         exit(-1)
 
     try:
         s.sendto(sip_req.bytes, (args.dest_ip, args.dest_port))
-    except Exception, e:
-        print "Error - could not send packet.\n    " + str(e)
+    except Exception as e:
+        print("Error - could not send packet.\n    " + str(e))
         exit(-1)
 
-    print "SIP message sent successfully"
+    print("SIP message sent successfully")
 
 if __name__ == '__main__':
     main()
