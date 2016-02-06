@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import socket
-from optparse import OptionParser
+from argparse import ArgumentParser
 
 
 #class SIPRigException(Exception):
@@ -47,77 +47,75 @@ def get_socket(src_address, src_port):
     return s
 
 
-def get_options():
-    usage = "%prog [OPTIONS]"
-    parser = OptionParser(usage=usage)
-    parser.add_option('-f',
-                      '--input_file',
-                      dest='input_file',
-                      type='string',
-                      default=None,
-                      help='*Required - Input file')
-    parser.add_option('-d',
-                      '--dest-ip',
-                      dest='dest_ip',
-                      type='string',
-                      default=None,
-                      help='*Required - Destination IP address.')
-    parser.add_option('-p',
-                      '--dest-port',
-                      dest='dest_port',
-                      type='int',
-                      default=5060,
-                      help='Destination port.  Defaults to 5060.')
-    parser.add_option('-S',
-                      '--src-ip',
-                      dest='src_ip',
-                      type='string',
-                      default='',
-                      help='Source IP address.')
-    parser.add_option('-P',
-                      '--src-port',
-                      dest='src_port',
-                      type='int',
-                      default=0,
-                      help='Source port.')
-    parser.add_option('--no-validation',
-                      dest='validate_request',
-                      action='store_false',
-                      default=True,
-                      help='Disable line ending validation.')
+def get_args():
+    parser = ArgumentParser()
+    parser.add_argument('-f',
+                        '--input_file',
+                        dest='input_file',
+                        default=None,
+                        help='*Required - Input file',
+                        required=True)
+    parser.add_argument('-d',
+                        '--dest-ip',
+                        dest='dest_ip',
+                        default=None,
+                        help='*Required - Destination IP address.',
+                        required=True)
+    parser.add_argument('-p',
+                        '--dest-port',
+                        dest='dest_port',
+                        type=int,
+                        default=5060,
+                        help='Destination port.  Defaults to 5060.')
+    parser.add_argument('-S',
+                        '--src-ip',
+                        dest='src_ip',
+                        default='',
+                        help='Source IP address.')
+    parser.add_argument('-P',
+                        '--src-port',
+                        dest='src_port',
+                        type=int,
+                        default=0,
+                        help='Source port.')
+    parser.add_argument('--no-validation',
+                        dest='validate_request',
+                        action='store_false',
+                        default=True,
+                        help='Disable line ending validation.')
 
-    (options, args) = parser.parse_args()
+    args = parser.parse_args()
 
-    if (options.input_file is None):
+    if (args.input_file is None):
         print "No input file specified\n"
         parser.print_help()
         exit(-1)
 
-    if (options.dest_ip is None):
+    if (args.dest_ip is None):
         print "No destination IP specified\n"
         parser.print_help()
         exit(-1)
 
-    return options
+    return args
 
 
 def main():
-    options = get_options()
+    args = get_args()
 
     #try:
-    sip_req = Request(options.input_file, options.validate_request)
+    sip_req = Request(args.input_file, args.validate_request)
     #except SIPRigRequestException, e:
     #    print "Error - could not load from file:\n    " + str(e)
     #    exit(-1)
 
     try:
-        s = get_socket(options.src_ip, options.src_port)
+        s = get_socket(args.src_ip, args.src_port)
     except Exception, e:
         print "Error - could not create socket:\n    " + str(e)
         exit(-1)
 
     try:
-        s.sendto(sip_req.bytes, (options.dest_ip, options.dest_port))
+        s.sendto(sip_req.bytes, (args.dest_ip, args.dest_port))
     except Exception, e:
         print "Error - could not send packet.\n    " + str(e)
         exit(-1)
