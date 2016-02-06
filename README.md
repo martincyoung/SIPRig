@@ -33,7 +33,7 @@ SIPRig works under both python 2.7 and python 3.
 
     $ python siprig.py -h
     usage: siprig.py [-h] -f INPUT_FILE -d DEST_IP [-p DEST_PORT] [-S SRC_IP]
-                     [-P SRC_PORT] [--no-validation]
+                     [-P SRC_PORT] [--timeout TIMEOUT] [--no-validation]
 
     optional arguments:
       -h, --help            show this help message and exit
@@ -47,6 +47,7 @@ SIPRig works under both python 2.7 and python 3.
                             Source IP address.
       -P SRC_PORT, --src-port SRC_PORT
                             Source port.
+      --timeout TIMEOUT     Time in seconds to wait for a response. Default 1s.
       --no-validation       Disable line ending validation.
 
 ## Installation

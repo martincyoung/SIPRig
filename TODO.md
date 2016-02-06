@@ -1,9 +1,9 @@
 ## TODO
 
-- EASY.  Wait for a response.
+- EASY.  Add a 'quiet' option.
 - EASY.  Nicer exception handling.
 - EASY.  Populate a set of default headers if they're not specified in the input.
-- EASY.  Add warning if validation is disabled.  Include option to silence warnings.
+- EASY.  Add warning if validation is disabled.
 - MEDIUM.  Automatically populate SIP values based on destination and source values.
 - MEDIUM.  Option to use TCP instead of UDP.
 - MEDIUM.  Some tests would be nice...
