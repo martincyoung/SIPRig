@@ -72,8 +72,8 @@ def get_options():
                       '--src-port',
                       dest='src_port',
                       type='int',
-                      default=5060,
-                      help='Source port.  Defaults to 5060.')
+                      default=0,
+                      help='Source port.')
 
     (options, args) = parser.parse_args()
 
