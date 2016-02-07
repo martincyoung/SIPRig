@@ -78,7 +78,7 @@ def get_args():
                         dest='verbose',
                         action='store_true',
                         default=False,
-                        help='Verbose.')
+                        help='Show request and response in stdout.')
     parser.add_argument('--timeout',
                         dest='timeout',
                         type=float,

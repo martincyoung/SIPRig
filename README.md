@@ -74,6 +74,8 @@ SIPRig works under both python 2.7 and python 3.
                             Source IP address.
       -P SRC_PORT, --src-port SRC_PORT
                             Source port.
+      -q, --quiet           Suppress all output.
+      -v, --verbose         Show request and response in stdout.
       --timeout TIMEOUT     Seconds to wait for a response. Default 1s.
       --no-validation       Disable line ending validation.
 
