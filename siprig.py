@@ -45,9 +45,9 @@ def get_args():
                         required=True)
     parser.add_argument('-d',
                         '--dest-ip',
-                        dest='dest_ip',
+                        dest='dest_addr',
                         default=None,
-                        help='*Required - Destination IP address.',
+                        help='*Required - Destination address.  IP or FQDN.',
                         required=True)
     parser.add_argument('-p',
                         '--dest-port',
@@ -89,14 +89,14 @@ def main():
         request = Request(args.input_file, args.validate_request)
 
         s = get_socket(args.src_ip, args.src_port, args.timeout)
-        s.sendto(request.bytes, (args.dest_ip, args.dest_port))
+        s.sendto(request.bytes, (args.dest_addr, args.dest_port))
 
-        print("\nRequest sent to %s:%d:\n" % (args.dest_ip, args.dest_port))
+        print("\nRequest sent to %s:%d:\n" % (args.dest_addr, args.dest_port))
         print(request.bytes.decode())
 
         response = s.recv(65535)
 
-        print("Response from %s:%d:\n" % (args.dest_ip, args.dest_port))
+        print("Response from %s:%d:\n" % (args.dest_addr, args.dest_port))
         print(response.decode())
 
     except socket.timeout:

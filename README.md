@@ -15,39 +15,66 @@ SIPRig works under both python 2.7 and python 3.
 ## Example Usage
 
     $ cat message.txt 
-    OPTIONS sip:192.168.1.1:8000 SIP/2.0
-    Via: SIP/2.0/UDP 192.168.0.26:8000
+    OPTIONS sip:sip.iptel.org SIP/2.0
+    Via: SIP/2.0/UDP 192.168.0.26:55220
     Max-Forwards: 70
-    From: "Dummy" <sip:dummy@192.168.0.26>
-    To: <sip:192.168.1.1:8000>
-    Contact: <sip:dummy@192.168.0.26:8000>
-    Call-ID: call-id@192.168.0.26
+    From: "Test" <sip:test@192.168.0.26>;tag=98765
+    To: <sip:sip.iptel.org>
+    Contact: <sip:dummy@192.168.0.26:55220>
+    Call-ID: 1234567@192.168.0.26
     CSeq: 1 OPTIONS
     Accept: application/sdp
     Content-Length: 0
 
-    $ python siprig.py -f message.txt -d 192.168.1.1
-    > SIP message sent successfully
+    $ python siprig.py -f message.txt -d sip.iptel.org -p 5060 -P 55220
+
+    Request sent to sip.iptel.org:5060:
+
+    OPTIONS sip:sip.iptel.org SIP/2.0
+    Via: SIP/2.0/UDP 192.168.0.26:55220
+    Max-Forwards: 70
+    From: "Test" <sip:test@192.168.0.26>;tag=98765
+    To: <sip:sip.iptel.org>
+    Contact: <sip:dummy@192.168.0.26:55220>
+    Call-ID: 1234567@192.168.0.26
+    CSeq: 1 OPTIONS
+    Accept: application/sdp
+    Content-Length: 0
+
+
+    Response from sip.iptel.org:5060:
+
+    SIP/2.0 200 OK
+    Via: SIP/2.0/UDP 192.168.0.26:55220
+    From: "Test" <sip:test@192.168.0.26>;tag=98765
+    To: <sip:sip.iptel.org>;tag=0D4E4EA6-56B7B180000D950B-55778700
+    Call-ID: 1234567@192.168.0.26
+    CSeq: 1 OPTIONS
+    Accept: */*
+    Accept-Language: en
+    Server: ser (3.3.0-pre1 (i386/linux))
+    Contact: <sip:0D4E4EA6-56B7B180000D950B-55778700@212.79.111.155;transport=udp>
+    Content-Length: 0
 
 ## Full Usage
 
     $ python siprig.py -h
-    usage: siprig.py [-h] -f INPUT_FILE -d DEST_IP [-p DEST_PORT] [-S SRC_IP]
+    usage: siprig.py [-h] -f INPUT_FILE -d DEST_ADDR [-p DEST_PORT] [-S SRC_IP]
                      [-P SRC_PORT] [--timeout TIMEOUT] [--no-validation]
 
     optional arguments:
       -h, --help            show this help message and exit
       -f INPUT_FILE, --input_file INPUT_FILE
                             *Required - Input file
-      -d DEST_IP, --dest-ip DEST_IP
-                            *Required - Destination IP address.
+      -d DEST_ADDR, --dest-ip DEST_ADDR
+                            *Required - Destination address. IP or FQDN.
       -p DEST_PORT, --dest-port DEST_PORT
-                            Destination port. Defaults to 5060.
+                            Destination port. Default 5060.
       -S SRC_IP, --src-ip SRC_IP
                             Source IP address.
       -P SRC_PORT, --src-port SRC_PORT
                             Source port.
-      --timeout TIMEOUT     Time in seconds to wait for a response. Default 1s.
+      --timeout TIMEOUT     Seconds to wait for a response. Default 1s.
       --no-validation       Disable line ending validation.
 
 ## Installation
