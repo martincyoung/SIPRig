@@ -26,7 +26,7 @@ SIPRig works under both python 2.7 and python 3.
     Accept: application/sdp
     Content-Length: 0
 
-    $ python siprig.py -f message.txt -d sip.iptel.org -p 5060 -P 55220
+    $ python siprig.py -f message.txt -d sip.iptel.org -p 5060 -P 55220 -v
 
     Request sent to sip.iptel.org:5060:
 

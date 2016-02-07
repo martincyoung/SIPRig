@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import socket
+import sys
 from argparse import ArgumentParser
 
 
@@ -66,6 +67,18 @@ def get_args():
                         type=int,
                         default=0,
                         help='Source port.')
+    parser.add_argument('-q',
+                        '--quiet',
+                        dest='quiet',
+                        action='store_true',
+                        default=False,
+                        help='Suppress all output.')
+    parser.add_argument('-v',
+                        '--verbose',
+                        dest='verbose',
+                        action='store_true',
+                        default=False,
+                        help='Verbose.')
     parser.add_argument('--timeout',
                         dest='timeout',
                         type=float,
@@ -91,23 +104,32 @@ def main():
         s = get_socket(args.src_ip, args.src_port, args.timeout)
         s.sendto(request.bytes, (args.dest_addr, args.dest_port))
 
-        print("\nRequest sent to %s:%d:\n" % (args.dest_addr, args.dest_port))
-        print(request.bytes.decode())
+        if not args.quiet:
+            sys.stdout.write("\nRequest sent to %s:%d\n\n" %
+                             (args.dest_addr, args.dest_port))
+            if args.verbose:
+                sys.stdout.write(request.bytes.decode() + "\n")
 
         response = s.recv(65535)
 
-        print("Response from %s:%d:\n" % (args.dest_addr, args.dest_port))
-        print(response.decode())
+        if not args.quiet:
+            sys.stdout.write("Response from %s:%d\n\n" %
+                             (args.dest_addr, args.dest_port))
+            if args.verbose:
+                sys.stdout.write(response.decode() + "\n")
 
     except socket.timeout:
-        print('No response received within %0.1f seconds' % args.timeout)
+        if not args.quiet:
+            sys.stdout.write("No response received within %0.1f seconds\n" %
+                             args.timeout)
 
     except socket.error as e:
-        print("Error - could not create socket:\n    " + str(e))
+        sys.stderr.write("Error - could not create socket:\n    %s\n" %
+                         str(e))
         exit(-1)
 
     except Exception as e:
-        print("Error:\n    " + str(e))
+        sys.stderr.write("Error:\n    %s\n" % str(e))
         exit(-1)
 
     finally:
