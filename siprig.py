@@ -27,10 +27,23 @@ class Request():
             self.bytes += '\n'.encode()
 
 
-def get_socket(src_address, src_port, timeout):
-    # Create an IPv4 UDP socket.  If no source address or source port is
-    # provided, the socket module assigns this automatically.
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+def get_socket(src_address, src_port, timeout, tcp):
+    # Create an IPv4 socket.
+    if tcp:
+        # Create an IPv4 TCP socket.  Set REUSEADDR so that the port can be
+        # reused without waiting for the TIME_WAIT state to pass.
+        s = socket.socket(socket.AF_INET,
+                          socket.SOCK_STREAM,
+                          socket.IPPROTO_TCP)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    else:
+        # Create an IPv4 UDP socket.
+        s = socket.socket(socket.AF_INET,
+                          socket.SOCK_DGRAM,
+                          socket.IPPROTO_UDP)
+
+    # If no source address or source port is provided, the socket module
+    # assigns this automatically.
     s.bind((src_address, src_port))
     s.settimeout(timeout)
     return s
@@ -79,6 +92,11 @@ def get_args():
                         action='store_true',
                         default=False,
                         help='Show request and response in stdout.')
+    parser.add_argument('--tcp',
+                        dest='tcp',
+                        action='store_true',
+                        default=False,
+                        help='Use TCP instead of UDP.  Default False.')
     parser.add_argument('--timeout',
                         dest='timeout',
                         type=float,
@@ -101,8 +119,9 @@ def main():
     try:
         request = Request(args.input_file, args.validate_request)
 
-        s = get_socket(args.src_ip, args.src_port, args.timeout)
-        s.sendto(request.bytes, (args.dest_addr, args.dest_port))
+        s = get_socket(args.src_ip, args.src_port, args.timeout, args.tcp)
+        s.connect((args.dest_addr, args.dest_port))
+        s.send(request.bytes)
 
         if not args.quiet:
             sys.stdout.write("\nRequest sent to %s:%d\n\n" %
@@ -123,17 +142,9 @@ def main():
             sys.stdout.write("No response received within %0.1f seconds\n" %
                              args.timeout)
 
-    except socket.error as e:
-        sys.stderr.write("Error - could not create socket:\n    %s\n" %
-                         str(e))
-        exit(-1)
-
-    except Exception as e:
-        sys.stderr.write("Error:\n    %s\n" % str(e))
-        exit(-1)
-
     finally:
         try:
+            s.shutdown(1)
             s.close()
         except UnboundLocalError:
             # Socket has not been assigned.
