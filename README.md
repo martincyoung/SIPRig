@@ -6,7 +6,7 @@ SIPRig is a lightweight tool for sending a SIP message.
 
 [SIPp](http://sipp.sourceforge.net) is a fantastic tool for generating SIP dialogs.  However there is a slight learning curve and setup overhead.
 
-If you don't care for valid SIP dialog, or even valid SIP, then SIPRig is for you!  Construct your SIP message in an input file and send it to an unsuspecting address of your choosing.
+If you don't care for valid SIP dialog, or even valid SIP, then SIPRig is for you!  Construct your SIP message in an input file and send it anywhere.
 
 ## Limitations
 
@@ -82,8 +82,6 @@ SIPRig works under both python 2.7 and python 3.
       --no-validation       Disable line ending validation.
 
 ## Installation
-
-Download it using the 'Download ZIP' option in the top right, clone it, or just copy it right from the page.
 
     $ git clone git://github.com/martincyoung/SIPRig
 
