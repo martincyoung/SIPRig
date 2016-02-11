@@ -41,6 +41,8 @@ class Arguments():
     def __init__(self):
         self.parser = ArgumentParser()
         self.add_arguments()
+        self.parse_args()
+        self.validate()
 
     def parse_args(self):
         # Parse the supplied arguments and map each one to an attribute on
@@ -139,8 +141,6 @@ def get_socket(src_address, src_port, timeout, protocol):
 
 def main():
     args = Arguments()
-    args.parse_args()
-    args.validate()
 
     try:
         request = Request(args.input_file, args.validate_request)
