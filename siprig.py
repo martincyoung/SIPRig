@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import re
 import socket
 import sys
 from argparse import ArgumentParser
@@ -26,10 +27,19 @@ class Request():
         while (self.bytes[-2:] != '\n\n'.encode()):
             self.bytes += '\n'.encode()
 
+    def protocol(self):
+        pattern = re.compile(b"Via: SIP/2.0/(UDP|TCP)")
+        try:
+            return pattern.search(self.bytes).group(1).lower().decode()
+        except AttributeError:
+            # The regex didn't match anything in the source file.  Default to
+            # UDP.
+            return "udp"
 
-def get_socket(src_address, src_port, timeout, tcp):
+
+def get_socket(src_address, src_port, timeout, protocol):
     # Create an IPv4 socket.
-    if tcp:
+    if protocol == "tcp":
         # Create an IPv4 TCP socket.  Set REUSEADDR so that the port can be
         # reused without waiting for the TIME_WAIT state to pass.
         s = socket.socket(socket.AF_INET,
@@ -96,7 +106,12 @@ def get_args():
                         dest='tcp',
                         action='store_true',
                         default=False,
-                        help='Use TCP instead of UDP.  Default False.')
+                        help='Force TCP protocol.')
+    parser.add_argument('--udp',
+                        dest='udp',
+                        action='store_true',
+                        default=False,
+                        help='Force UDP protocol.')
     parser.add_argument('--timeout',
                         dest='timeout',
                         type=float,
@@ -113,13 +128,28 @@ def get_args():
     return args
 
 
+def check_args(args):
+    if args.tcp and args.udp:
+        sys.stderr.write("Please specify only one of '--tcp' or '--udp'\n")
+        exit(-1)
+
+
 def main():
     args = get_args()
+
+    check_args(args)
 
     try:
         request = Request(args.input_file, args.validate_request)
 
-        s = get_socket(args.src_ip, args.src_port, args.timeout, args.tcp)
+        protocol = "udp"
+
+        if not args.tcp and not args.udp:
+            protocol = request.protocol()
+        elif args.tcp:
+            protocol = "tcp"
+
+        s = get_socket(args.src_ip, args.src_port, args.timeout, protocol)
         s.connect((args.dest_addr, args.dest_port))
         s.send(request.bytes)
 
