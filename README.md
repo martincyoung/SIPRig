@@ -28,7 +28,7 @@ SIPRig works under both python 2.7 and python 3.
 
     $ python siprig.py -f message.txt -d sip.iptel.org -p 5060 -P 55220 -v
 
-    Request sent to sip.iptel.org:5060:
+    Request sent to sip.iptel.org:5060
 
     OPTIONS sip:sip.iptel.org SIP/2.0
     Via: SIP/2.0/UDP 192.168.0.26:55220
@@ -42,7 +42,7 @@ SIPRig works under both python 2.7 and python 3.
     Content-Length: 0
 
 
-    Response from sip.iptel.org:5060:
+    Response from sip.iptel.org:5060
 
     SIP/2.0 200 OK
     Via: SIP/2.0/UDP 192.168.0.26:55220
@@ -60,7 +60,7 @@ SIPRig works under both python 2.7 and python 3.
 
     $ python siprig.py -h
     usage: siprig.py [-h] -f INPUT_FILE -d DEST_ADDR [-p DEST_PORT] [-S SRC_IP]
-                     [-P SRC_PORT] [-q] [-v] [--tcp] [--timeout TIMEOUT]
+                     [-P SRC_PORT] [-q] [-v] [--tcp] [--udp] [--timeout TIMEOUT]
                      [--no-validation]
 
     optional arguments:
@@ -77,7 +77,8 @@ SIPRig works under both python 2.7 and python 3.
                             Source port.
       -q, --quiet           Suppress all output.
       -v, --verbose         Show request and response in stdout.
-      --tcp                 Use TCP instead of UDP. Default False.
+      --tcp                 Force TCP protocol.
+      --udp                 Force UDP protocol.
       --timeout TIMEOUT     Seconds to wait for a response. Default 1s.
       --no-validation       Disable line ending validation.
 

@@ -37,8 +37,86 @@ class Request():
             return "udp"
 
 
+class Arguments():
+    def __init__(self):
+        self.parser = ArgumentParser()
+        self.add_arguments()
+
+    def parse_args(self):
+        # Parse the supplied arguments and map each one to an attribute on
+        # the Argument object.
+        for k, v in self.parser.parse_args().__dict__.items():
+            setattr(self, k, v)
+
+    def validate(self):
+        if self.tcp and self.udp:
+            sys.stderr.write("Please specify only one of TCP or UDP\n")
+            exit(-1)
+
+    def add_arguments(self):
+        self.parser.add_argument('-f',
+                                 '--input_file',
+                                 dest='input_file',
+                                 default=None,
+                                 help='*Required - Input file',
+                                 required=True)
+        self.parser.add_argument('-d',
+                                 '--dest-ip',
+                                 dest='dest_addr',
+                                 default=None,
+                                 help='*Required - Destination address.  IP or FQDN.',
+                                 required=True)
+        self.parser.add_argument('-p',
+                                 '--dest-port',
+                                 dest='dest_port',
+                                 type=int,
+                                 default=5060,
+                                 help='Destination port.  Default 5060.')
+        self.parser.add_argument('-S',
+                                 '--src-ip',
+                                 dest='src_ip',
+                                 default='',
+                                 help='Source IP address.')
+        self.parser.add_argument('-P',
+                                 '--src-port',
+                                 dest='src_port',
+                                 type=int,
+                                 default=0,
+                                 help='Source port.')
+        self.parser.add_argument('-q',
+                                 '--quiet',
+                                 dest='quiet',
+                                 action='store_true',
+                                 default=False,
+                                 help='Suppress all output.')
+        self.parser.add_argument('-v',
+                                 '--verbose',
+                                 dest='verbose',
+                                 action='store_true',
+                                 default=False,
+                                 help='Show request and response in stdout.')
+        self.parser.add_argument('--tcp',
+                                 dest='tcp',
+                                 action='store_true',
+                                 default=False,
+                                 help='Force TCP protocol.')
+        self.parser.add_argument('--udp',
+                                 dest='udp',
+                                 action='store_true',
+                                 default=False,
+                                 help='Force UDP protocol.')
+        self.parser.add_argument('--timeout',
+                                 dest='timeout',
+                                 type=float,
+                                 default=1.0,
+                                 help='Seconds to wait for a response.  Default 1s.')
+        self.parser.add_argument('--no-validation',
+                                 dest='validate_request',
+                                 action='store_false',
+                                 default=True,
+                                 help='Disable line ending validation.')
+
 def get_socket(src_address, src_port, timeout, protocol):
-    # Create an IPv4 socket.
     if protocol == "tcp":
         # Create an IPv4 TCP socket.  Set REUSEADDR so that the port can be
         # reused without waiting for the TIME_WAIT state to pass.
@@ -59,85 +137,10 @@ def get_socket(src_address, src_port, timeout, protocol):
     return s
 
 
-def get_args():
-    parser = ArgumentParser()
-    parser.add_argument('-f',
-                        '--input_file',
-                        dest='input_file',
-                        default=None,
-                        help='*Required - Input file',
-                        required=True)
-    parser.add_argument('-d',
-                        '--dest-ip',
-                        dest='dest_addr',
-                        default=None,
-                        help='*Required - Destination address.  IP or FQDN.',
-                        required=True)
-    parser.add_argument('-p',
-                        '--dest-port',
-                        dest='dest_port',
-                        type=int,
-                        default=5060,
-                        help='Destination port.  Default 5060.')
-    parser.add_argument('-S',
-                        '--src-ip',
-                        dest='src_ip',
-                        default='',
-                        help='Source IP address.')
-    parser.add_argument('-P',
-                        '--src-port',
-                        dest='src_port',
-                        type=int,
-                        default=0,
-                        help='Source port.')
-    parser.add_argument('-q',
-                        '--quiet',
-                        dest='quiet',
-                        action='store_true',
-                        default=False,
-                        help='Suppress all output.')
-    parser.add_argument('-v',
-                        '--verbose',
-                        dest='verbose',
-                        action='store_true',
-                        default=False,
-                        help='Show request and response in stdout.')
-    parser.add_argument('--tcp',
-                        dest='tcp',
-                        action='store_true',
-                        default=False,
-                        help='Force TCP protocol.')
-    parser.add_argument('--udp',
-                        dest='udp',
-                        action='store_true',
-                        default=False,
-                        help='Force UDP protocol.')
-    parser.add_argument('--timeout',
-                        dest='timeout',
-                        type=float,
-                        default=1.0,
-                        help='Seconds to wait for a response.  Default 1s.')
-    parser.add_argument('--no-validation',
-                        dest='validate_request',
-                        action='store_false',
-                        default=True,
-                        help='Disable line ending validation.')
-
-    args = parser.parse_args()
-
-    return args
-
-
-def check_args(args):
-    if args.tcp and args.udp:
-        sys.stderr.write("Please specify only one of '--tcp' or '--udp'\n")
-        exit(-1)
-
-
 def main():
-    args = get_args()
-
-    check_args(args)
+    args = Arguments()
+    args.parse_args()
+    args.validate()
 
     try:
         request = Request(args.input_file, args.validate_request)
