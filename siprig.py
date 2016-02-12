@@ -6,10 +6,9 @@ from argparse import ArgumentParser
 
 
 class Request():
-    def __init__(self, input_file, validate):
+    def __init__(self, input_file, validate, quiet):
         self.bytes = self.get_req_from_file(input_file)
-        if validate:
-            self.validate()
+        self.validate_request(validate, quiet)
 
     def get_req_from_file(self, input_file):
         # Read the input file as a byte array, and convert to Unix line
@@ -20,8 +19,16 @@ class Request():
 
         return sip_bytes
 
-    def validate(self):
-        self.add_blank_lines()
+    def validate_request(self, validate, quiet):
+        if (self.bytes[-2:] != '\n\n'.encode()):
+            # Input file does not end in two blank lines.
+            if validate:
+                self.add_blank_lines()
+            elif not quiet:
+                # Input file will result in malformed SIP.
+                sys.stderr.write("\nWARNING: Malformed SIP - two blank " \
+                                 "lines required at the end of the input " \
+                                 "file\n")
 
     def add_blank_lines(self):
         while (self.bytes[-2:] != '\n\n'.encode()):
@@ -52,7 +59,7 @@ class Arguments():
 
     def validate(self):
         if self.tcp and self.udp:
-            sys.stderr.write("Please specify only one of TCP or UDP\n")
+            sys.stderr.write("\nPlease specify only one of TCP or UDP\n")
             exit(-1)
 
     def add_arguments(self):
@@ -66,7 +73,8 @@ class Arguments():
                                  '--dest-ip',
                                  dest='dest_addr',
                                  default=None,
-                                 help='*Required - Destination address.  IP or FQDN.',
+                                 help='*Required - Destination address.  ' \
+                                      'IP or FQDN.',
                                  required=True)
         self.parser.add_argument('-p',
                                  '--dest-port',
@@ -111,12 +119,14 @@ class Arguments():
                                  dest='timeout',
                                  type=float,
                                  default=1.0,
-                                 help='Seconds to wait for a response.  Default 1s.')
+                                 help='Seconds to wait for a response.  ' \
+                                      'Default 1s.')
         self.parser.add_argument('--no-validation',
                                  dest='validate_request',
                                  action='store_false',
                                  default=True,
-                                 help='Disable line ending validation.')
+                                 help='Disable input file blank line ' \
+                                      'validation.')
 
 def get_socket(src_address, src_port, timeout, protocol):
     if protocol == "tcp":
@@ -143,7 +153,7 @@ def main():
     args = Arguments()
 
     try:
-        request = Request(args.input_file, args.validate_request)
+        request = Request(args.input_file, args.validate_request, args.quiet)
 
         protocol = "udp"
 
