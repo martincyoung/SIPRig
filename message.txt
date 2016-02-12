@@ -1,11 +1,10 @@
-OPTIONS sip:sip.iptel.org SIP/2.0
+OPTIONS sip:ideasip.com SIP/2.0
 Via: SIP/2.0/UDP 192.168.0.26:55220
 Max-Forwards: 70
 From: "Test" <sip:test@192.168.0.26>;tag=98765
-To: <sip:sip.iptel.org>
+To: <sip:ideasip.com>
 Contact: <sip:dummy@192.168.0.26:55220>
 Call-ID: 1234567@192.168.0.26
 CSeq: 1 OPTIONS
 Accept: application/sdp
 Content-Length: 0
-
