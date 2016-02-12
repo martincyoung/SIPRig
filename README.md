@@ -59,15 +59,15 @@ SIPRig works under both python 2.7 and python 3.
 ## Full Usage
 
     $ python siprig.py -h
-    usage: siprig.py [-h] -f INPUT_FILE -d DEST_ADDR [-p DEST_PORT] [-S SRC_IP]
-                     [-P SRC_PORT] [-q] [-v] [--tcp] [--udp] [--timeout TIMEOUT]
-                     [--no-validation]
+    usage: siprig.py [-h] [-f INPUT_FILE] [-d DEST_ADDR] [-p DEST_PORT]
+                     [-S SRC_IP] [-P SRC_PORT] [-q] [-v] [--tcp] [--udp]
+                     [--timeout TIMEOUT] [--no-validation]
 
     optional arguments:
       -h, --help            show this help message and exit
       -f INPUT_FILE, --input_file INPUT_FILE
                             *Required - Input file
-      -d DEST_ADDR, --dest-ip DEST_ADDR
+      -d DEST_ADDR, --dest-addr DEST_ADDR
                             *Required - Destination address. IP or FQDN.
       -p DEST_PORT, --dest-port DEST_PORT
                             Destination port. Default 5060.
@@ -80,7 +80,7 @@ SIPRig works under both python 2.7 and python 3.
       --tcp                 Force TCP protocol.
       --udp                 Force UDP protocol.
       --timeout TIMEOUT     Seconds to wait for a response. Default 1s.
-      --no-validation       Disable line ending validation.
+      --no-validation       Disable input file blank line validation.
 
 ## Installation
 

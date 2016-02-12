@@ -1,7 +1,6 @@
 ## TODO
 
 - EASY.  Add a suite of example SIP messages.
-- EASY.  Refactor and improve argument validation.
 - MEDIUM.  Automatically populate SIP values based on destination and source values.
 - MEDIUM.  Some tests would be nice...
 - MEDIUM.  Automatically calculate the Content-Length header.

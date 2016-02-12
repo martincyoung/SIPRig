@@ -5,6 +5,10 @@ import sys
 from argparse import ArgumentParser
 
 
+class ArgumentsException(Exception):
+    pass
+
+
 class Request():
     def __init__(self, input_file, validate, quiet):
         self.bytes = self.get_req_from_file(input_file)
@@ -26,9 +30,8 @@ class Request():
                 self.add_blank_lines()
             elif not quiet:
                 # Input file will result in malformed SIP.
-                sys.stderr.write("\nWARNING: Malformed SIP - two blank " \
-                                 "lines required at the end of the input " \
-                                 "file\n")
+                sys.stderr.write("\nWARNING: Malformed SIP - two blank lines "
+                                 "required at the end of the input file\n")
 
     def add_blank_lines(self):
         while (self.bytes[-2:] != '\n\n'.encode()):
@@ -59,23 +62,26 @@ class Arguments():
 
     def validate(self):
         if self.tcp and self.udp:
-            sys.stderr.write("\nPlease specify only one of TCP or UDP\n")
-            exit(-1)
+            raise ArgumentsException("Please specify only one of TCP or UDP")
+
+        if not self.input_file:
+            raise ArgumentsException("Please specify an input file with '-f'")
+
+        if not self.dest_addr:
+            raise ArgumentsException("Please specify a destination with '-d'")
 
     def add_arguments(self):
         self.parser.add_argument('-f',
                                  '--input_file',
                                  dest='input_file',
                                  default=None,
-                                 help='*Required - Input file',
-                                 required=True)
+                                 help='*Required - Input file')
         self.parser.add_argument('-d',
-                                 '--dest-ip',
+                                 '--dest-addr',
                                  dest='dest_addr',
                                  default=None,
-                                 help='*Required - Destination address.  ' \
-                                      'IP or FQDN.',
-                                 required=True)
+                                 help='*Required - Destination address.  IP '
+                                      'or FQDN.')
         self.parser.add_argument('-p',
                                  '--dest-port',
                                  dest='dest_port',
@@ -119,14 +125,15 @@ class Arguments():
                                  dest='timeout',
                                  type=float,
                                  default=1.0,
-                                 help='Seconds to wait for a response.  ' \
+                                 help='Seconds to wait for a response.  '
                                       'Default 1s.')
         self.parser.add_argument('--no-validation',
                                  dest='validate_request',
                                  action='store_false',
                                  default=True,
-                                 help='Disable input file blank line ' \
+                                 help='Disable input file blank line '
                                       'validation.')
+
 
 def get_socket(src_address, src_port, timeout, protocol):
     if protocol == "tcp":
@@ -150,22 +157,30 @@ def get_socket(src_address, src_port, timeout, protocol):
 
 
 def main():
-    args = Arguments()
-
     try:
+        args = Arguments()
+
         request = Request(args.input_file, args.validate_request, args.quiet)
 
+        # Set the protocol from the arguments or the request.  Default to UDP
+        # in the case where nothing is specified and it is not possible to
+        # deduce from the request.
         protocol = "udp"
 
         if not args.tcp and not args.udp:
+            # No protocol was specified in the arguments.  Work it out from
+            # the request.
             protocol = request.protocol()
         elif args.tcp:
             protocol = "tcp"
 
+        # Configure a socket and send the request.
         s = get_socket(args.src_ip, args.src_port, args.timeout, protocol)
         s.connect((args.dest_addr, args.dest_port))
         s.send(request.bytes)
 
+        # Depending on the 'quiet' and 'verbose' options, print information
+        # to stdout with the status of the send and receive operations.
         if not args.quiet:
             sys.stdout.write("\nRequest sent to %s:%d\n\n" %
                              (args.dest_addr, args.dest_port))
@@ -180,13 +195,22 @@ def main():
             if args.verbose:
                 sys.stdout.write(response.decode() + "\n")
 
+    except ArgumentsException as e:
+        sys.stderr.write("\nERROR: " + e.message + ".  Use '-h' for info.\n")
+        sys.exit(-1)
+
     except socket.timeout:
+        # Socket timed out.  This could mean that no response was received
+        # from the far end for a sent SIP packet, or that a TCP connection
+        # was not established within the timeout limit.
         if not args.quiet:
             sys.stdout.write("No response received within %0.1f seconds\n" %
                              args.timeout)
 
     finally:
         try:
+            # Regardless of what happened, try to gracefully close down the
+            # socket.
             s.shutdown(1)
             s.close()
         except UnboundLocalError:
