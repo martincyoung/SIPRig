@@ -196,7 +196,7 @@ def main():
                 sys.stdout.write(response.decode() + "\n")
 
     except ArgumentsException as e:
-        sys.stderr.write("\nERROR: " + e.message + ".  Use '-h' for info.\n")
+        sys.stderr.write("\nERROR: " + str(e) + ".  Use '-h' for info.\n")
         sys.exit(-1)
 
     except socket.timeout:

@@ -8,9 +8,25 @@ SIPRig is a lightweight tool for sending a SIP message.
 
 If you don't care for valid SIP dialog, or even valid SIP, then SIPRig is for you!  Construct your SIP message in an input file and send it anywhere.
 
-## Limitations
+## Features
 
-SIPRig works under both python 2.7 and python 3.
+- Send any SIP message anywhere
+
+  SIPRig allows you to send a SIP message to a destination of your choice.  Construct (or copy) your SIP message in an input file and use the `-f` command line option to specify the location.  Your input does not have to be valid SIP (discussed later).  You have complete control over the headers and content of your message.
+
+  Use the `-d` flag to specify a destination as an IP or a FQDN.
+
+  You can also specify the destination port, src address and port, and several other options.  SIPRig will use sensible defaults if these are not provided.  See the usage below.
+
+- Guard against malformed SIP
+
+  SIPRig automatically ensures your input file ends in two blank lines to guard against malformed SIP. This can be disabled using the `--no-validation` option.
+
+- Protocol detection
+
+  SIPRig automatically detects the protocol based on the input file.  You can override this by explicitly specifying the protcol with the `--tcp` and `--udp` options.
+
+- SIPRig works under both python 2.7 and python 3
 
 ## Example Usage
 
